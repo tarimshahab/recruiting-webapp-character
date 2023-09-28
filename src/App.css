@@ -32,6 +32,9 @@
   color: white;
 }
 
+.App-subsection {
+  border: solid white 2px;
+}
 .App-link {
   color: #61dafb;
 }
