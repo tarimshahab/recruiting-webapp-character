@@ -4,26 +4,24 @@ import AttributeSection from "./Attribute";
 import ClassSection from "./Class";
 import SkillSection from "./Skill";
 
-export default function Character({ character }) {
-  const { name: charName, attributes, skills } = character;
-  const [curAttrs, setCurAttrs] = useState(attributes);
-  const [curSkills, setCurSkills] = useState(skills);
+export default function Character({ character, updateAttribute, updateSkill }) {
+  const { name, attributes, skills } = character;
 
   const [selectedSkill, setSelectedSkill] = useState("Acrobatics");
 
   const skillOptions = [];
-  for (const { name } of SKILL_LIST) {
+  for (const { name: skillName } of SKILL_LIST) {
     skillOptions.push(
-      <option key={`char-${charName}-check-option-${name}`} value={name}>{name}</option>
+      <option key={`char-${name}-check-option-${skillName}`} value={skillName}>{skillName}</option>
     );
   }
 
   const [DC, setDC] = useState(20);
-  const intModifier = Math.floor((curAttrs["Intelligence"] - 10) / 2);
+  const intModifier = Math.floor((attributes["Intelligence"] - 10) / 2);
   const totalSkillPoints = Math.max(10 + 4 * intModifier, 0);
   return (
     <div style={{ margin: "30px 20px" }} >
-      CHARACTER: {charName}
+      CHARACTER: {name}
       <section className="App-subsection">
         Skill check:
         <select
@@ -36,9 +34,15 @@ export default function Character({ character }) {
         <button>Roll</button>
       </section>
 
-      <AttributeSection curAttrs={curAttrs} setCurAttrs={setCurAttrs} />
-      <ClassSection curAttrs={curAttrs} />
-      <SkillSection curAttrs={curAttrs} curSkills={curSkills} setCurSkills={setCurSkills} totalSkillPoints={totalSkillPoints} />
+      <AttributeSection
+        attributes={attributes}
+        updateAttribute={updateAttribute} />
+      <ClassSection attributes={attributes} />
+      <SkillSection
+        attributes={attributes}
+        skills={skills}
+        updateSkill={updateSkill}
+        totalSkillPoints={totalSkillPoints} />
     </div>
   )
 

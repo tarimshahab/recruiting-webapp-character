@@ -1,7 +1,7 @@
 import { CLASS_LIST } from "../consts";
 import { useState } from 'react';
 
-export default function ClassSection({ curAttrs }) {
+export default function ClassSection({ attributes }) {
   return (
     <section className='App-subsection'>
       CLASSES
@@ -9,7 +9,7 @@ export default function ClassSection({ curAttrs }) {
         <Class
           key={'class-' + name}
           rpgClassName={name}
-          curAttrs={curAttrs}
+          curAttrs={attributes}
         />
       )}
     </section>

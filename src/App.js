@@ -21,7 +21,51 @@ function App() {
     setCharacters({ ...characters, [char.name]: char });
   }
 
-  // DOES NOT WORK - have to move state up component tree so the changed characters are saved instead of initial character
+  function updateAttributeForChar(charName, attrName, delta) {
+    const { name, attributes, skills } = characters[charName];
+    const attributeSum = Object.values(attributes).reduce((acc, val) => acc + val);
+    if (attributeSum + delta > 70) {
+      alert("Total Attribute Points can't exceed 70!");
+      return;
+    };
+    const newCharacter = {
+      name,
+      attributes: {
+        ...attributes,
+        [attrName]: attributes[attrName] + delta
+      },
+      skills,
+    };
+    setCharacters({ ...characters, [charName]: newCharacter });
+  }
+
+  function updateSkillChar(charName, totalPoints, assignedPoints, skillName, delta) {
+    const { name, attributes, skills } = characters[charName];
+    if (assignedPoints > totalPoints) { //something has gone wrong, reset
+      const newSkills = { ...skills };
+      SKILL_LIST.forEach(skill => newSkills[skill.name] = 0);
+      const newChar = {
+        name,
+        attributes,
+        skills: newSkills
+      };
+      setCharacters({ ...characters, [charName]: newChar });
+    }
+    if (skills[skillName] + delta < 0 || assignedPoints + delta > totalPoints) {
+      return;
+    }
+    const newCharacter = {
+      name,
+      attributes,
+      skills: {
+        ...skills,
+        [skillName]: skills[skillName] + delta,
+        // assignedSkillPoints: assignedPoints + delta
+      }
+    };
+    setCharacters({ ...characters, [charName]: newCharacter });
+  }
+
   async function saveAllCharacters() {
     const response = await fetch("https://recruiting.verylongdomaintotestwith.ca/api/{tarimshahab}/character",
       {
@@ -38,7 +82,6 @@ function App() {
     }
   }
 
-  // DOES NOT WORK - have to move state up component tree so the changed characters are saved instead of initial character
   async function loadAllCharacters() {
     const response = await fetch("https://recruiting.verylongdomaintotestwith.ca/api/{tarimshahab}/character",
       {
@@ -54,7 +97,12 @@ function App() {
   }
 
   const characterComponents = Object.values(characters).map(char => (
-    <Character key={"char-" + char.name} character={char} setCharacters={setCharacters} />
+    <Character
+      key={"char-" + char.name}
+      character={char}
+      updateAttribute={(attrName, delta) => updateAttributeForChar(char.name, attrName, delta)}
+      updateSkill={(totalPoints, assignedPoints, skillName, delta) => updateSkillChar(char.name, totalPoints, assignedPoints, skillName, delta)}
+    />
   ));
 
   return (
@@ -67,7 +115,6 @@ function App() {
         <button onClick={saveAllCharacters}>Save All Characters</button>
         <button onClick={loadAllCharacters}>Load Characters</button>
         {characterComponents}
-        {/* <Character charName={"1"} curAttrs={curAttrs} setCurAttrs={setCurAttrs} curSkills={curSkills} setCurSkills={setCurSkills} /> */}
       </section>
     </div>
   );
